@@ -2,14 +2,15 @@
 
 namespace Ciareis\Bypass;
 
-use Illuminate\Support\Facades\Http;
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Process\Process;
 
 class Bypass
 {
-    protected $port;
-    protected $process;
-    protected $routes = [];
+    protected int $port;
+    protected Process|null $process;
+    protected array $routes = [];
 
     public static function open(?int $port = null): self
     {
@@ -141,10 +142,13 @@ class Bypass
         return $this->routes;
     }
 
+    /**
+     * @throws RouteNotCalledException
+     */
     public function assertRoutes(): void
     {
         $url = $this->getBaseUrl("___api_faker_router_index");
-        $routes = [];
+
         foreach ($this->routes as $route) {
             $uri = $route['uri'];
             $method = $route['method'];
@@ -152,9 +156,7 @@ class Bypass
 
             $response = Http::get($path);
 
-            $routes[$route['uri']] = $response->body();
-
-            $currentTimes = $response->json();
+            $currentTimes = json_decode((string)$response->getBody(), true, JSON_THROW_ON_ERROR);
             $expectedTimes = $route['times'];
             if ($currentTimes === $expectedTimes) {
                 continue;
@@ -169,6 +171,7 @@ class Bypass
         return $this->addRoute($method, $uri, $status, $body, $times);
     }
 
+    #[ArrayShape(['body' => "mixed", 'status' => "mixed"])]
     protected function addRouteParams(string $uri, array $params, int $times = 1): array
     {
         if (!$this->port || !$this->process) {
@@ -194,11 +197,12 @@ class Bypass
         ->put($url, $params);
 
         return [
-            'body' => $response->body(),
-            'status' => $response->status(),
+            'body' => (string)$response->getBody(),
+            'status' => $response->getStatusCode(),
         ];
     }
 
+    #[Pure]
     public function __toString()
     {
         return $this->getBaseUrl();

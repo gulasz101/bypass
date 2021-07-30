@@ -10,7 +10,7 @@
 */
 
 use Ciareis\Bypass\Bypass;
-use Illuminate\Support\Facades\Http;
+use Ciareis\Bypass\Http;
 use Tests\Services\GithubRepoService;
 use Tests\Services\LogoService;
 use Ciareis\Bypass\RouteNotCalledException;
@@ -88,8 +88,8 @@ it('returns route not found', function () {
 
     $response = Http::get($bypass->getBaseUrl('/no-route'));
 
-    expect($response->status())->toEqual(500);
-    expect($response->body())->toEqual('Bypass route /no-route and method GET not found.');
+    expect($response->getStatusCode())->toEqual(500);
+    expect((string)$response->getBody())->toEqual('Bypass route /no-route and method GET not found.');
 });
 
 it("properly gets the logo", function () {
@@ -115,8 +115,9 @@ it('returns exceptions when server down', function () {
     $bypass = Bypass::open();
     $bypass->down();
 
-    Http::get($bypass->getBaseUrl('/no-route'));
-})->throws(Illuminate\Http\Client\ConnectionException::class);
+    expect(Http::get($bypass->getBaseUrl('/no-route')))
+        ->getStatusCode();
+})->throws(\Http\Client\Exception\NetworkException::class);
 
 function getBody()
 {

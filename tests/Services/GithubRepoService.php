@@ -2,7 +2,7 @@
 
 namespace Tests\Services;
 
-use Illuminate\Support\Facades\Http;
+use Ciareis\Bypass\Http;
 use Exception;
 
 class GithubRepoService
@@ -26,11 +26,17 @@ class GithubRepoService
             return "Server down.";
         }
 
-        if ($response->status() === 503) {
+        if ($response->getStatusCode() === 503) {
             return "Server unavailable.";
         }
 
-        return collect($response->json())
-            ->sum('stargazers_count');
+        $data = json_decode((string)$response->getBody(), true, JSON_THROW_ON_ERROR);
+
+        $sum = 0;
+        foreach ($data as $datum) {
+            $sum += $datum['stargazers_count'] ?? 0;
+        }
+
+        return $sum;
     }
 }

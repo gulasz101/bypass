@@ -2,15 +2,7 @@
 
 namespace Tests;
 
-use Ciareis\Bypass\BypassServiceProvider;
-
-class TestCase extends \Orchestra\Testbench\TestCase
+class TestCase extends \PHPUnit\Framework\TestCase
 {
 
-    protected function getPackageProviders($app)
-    {
-        return [
-            BypassServiceProvider::class
-        ];
-    }
 }

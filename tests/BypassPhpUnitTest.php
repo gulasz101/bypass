@@ -15,8 +15,8 @@ namespace Tests;
 
 use Ciareis\Bypass\Bypass;
 use Ciareis\Bypass\Route;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Http;
+use Ciareis\Bypass\Http;
+use Http\Client\Exception\NetworkException;
 use Tests\Services\GithubRepoService;
 use Tests\Services\LogoService;
 
@@ -29,10 +29,6 @@ class BypassPhpUnitTest extends TestCase
         $bypass = Bypass::serve(
             Route::ok($path, body: $this->getBody())
         );
-
-        // Alternative option
-        // $bypass = Bypass::open();
-        // $bypass->addRoute(method: 'get', uri: $path, status: 200, body: $this->getBody());
 
         // execute
         $service = new GithubRepoService();
@@ -84,10 +80,11 @@ class BypassPhpUnitTest extends TestCase
         $bypass->addRoute(method: 'get', uri: '/no-route', status: 200);
         $bypass->stop();
 
-        $response = Http::get($bypass->getBaseUrl('/no-route'));
-
-        $this->assertSame(500, $response->status());
-        $this->assertSame('Bypass route /no-route and method GET not found.', $response->body());
+        expect(Http::get($bypass->getBaseUrl('/no-route')))
+            ->getStatusCode()->toBe(500)
+            ->getBody()
+            ->__toString()
+            ->toBe('Bypass route /no-route and method GET not found.');
     }
 
     public function test_returns_route_not_called_exception(): void
@@ -107,7 +104,7 @@ class BypassPhpUnitTest extends TestCase
         $bypass = Bypass::open();
         $bypass->down();
 
-        $this->expectException(\Illuminate\Http\Client\ConnectionException::class);
+        $this->expectException(NetworkException::class);
 
         Http::get($bypass->getBaseUrl('/no-route'));
     }
