@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ciareis\Bypass;
 
 class RouteFile
@@ -13,7 +15,7 @@ class RouteFile
     ) {
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return get_object_vars($this);
     }

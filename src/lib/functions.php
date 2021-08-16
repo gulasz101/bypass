@@ -1,15 +1,15 @@
 <?php
+declare(strict_types=1);
 
-function writeFile($filename, $content)
+/**
+ * @throws \JsonException
+ */
+function writeFile($filename, $content): bool
 {
-    if (!file_put_contents($filename, json_encode($content))) {
-        return false;
-    }
-
-    return true;
+    return !file_put_contents($filename, json_encode($content, JSON_THROW_ON_ERROR));
 }
 
-function getFilename($route, $method)
+function getFilename($route, $method): string
 {
     $sessionName = getSessionName();
 
@@ -19,12 +19,12 @@ function getFilename($route, $method)
     return "{$sessionName}_{$method}_{$route}.tmp";
 }
 
-function getSessionName()
+function getSessionName(): string
 {
     return sys_get_temp_dir() . DIRECTORY_SEPARATOR . "session_name_{$_SERVER['SERVER_PORT']}";
 }
 
-function getRoute(string $route, string $method = null)
+function getRoute(string $route, string $method = null): string
 {
     $file = getFilename($route, $method);
 
@@ -32,10 +32,16 @@ function getRoute(string $route, string $method = null)
         return "";
     }
 
-    return file_get_contents($file);
+    $fileContents = file_get_contents($file);
+
+    if (false === $fileContents) {
+        throw new \RuntimeException('Unable to read file.');
+    }
+
+    return $fileContents;
 }
 
-function setRoute(string $route, string $method, array $value)
+function setRoute(string $route, string $method, array $value): void
 {
     $file = getFilename($route, $method);
 
@@ -51,7 +57,7 @@ function setRoute(string $route, string $method, array $value)
     writeFile($file, $content);
 }
 
-function currentRoute()
+function currentRoute(): string
 {
     return getRoute($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 }

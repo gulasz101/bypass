@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 include_once("lib/functions.php");
 
 if ($_SERVER['REQUEST_METHOD'] === "GET" && $_SERVER['PHP_SELF'] === '/___api_faker_router_index') {
     $route = getRoute($_GET['route'], $_GET['method']);
-    $route = json_decode($route, true);
+    $route = json_decode($route, true, JSON_THROW_ON_ERROR);
 
     echo $route['count'];
 
@@ -16,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === "PUT" && $_SERVER['REQUEST_URI'] === '/___api
     $sessionName = getSessionName();
 
     foreach (glob($sessionName . "_*.tmp") as $file) {
-        @unlink($file);
+        unlink($file);
     }
     echo "ok.";
     exit;
@@ -25,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === "PUT" && $_SERVER['REQUEST_URI'] === '/___api
 
 if ($_SERVER['REQUEST_METHOD'] === "PUT" && $_SERVER['REQUEST_URI'] === '/___api_faker_add_router') {
     $inputs = file_get_contents("php://input");
-    $router = json_decode($inputs, true);
+    $router = json_decode($inputs, true, JSON_THROW_ON_ERROR);
 
     setRoute($router['uri'], $router['method'], $router);
     http_response_code(200);
@@ -35,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === "PUT" && $_SERVER['REQUEST_URI'] === '/___api
 }
 
 if ($route = currentRoute()) {
-    $route = json_decode($route, true);
+    $route = json_decode($route, true, JSON_THROW_ON_ERROR);
 
     http_response_code($route['status']);
     setRoute($route['uri'], $route['method'], $route);

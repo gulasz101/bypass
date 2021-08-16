@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ciareis\Bypass;
 
 use JetBrains\PhpStorm\ArrayShape;
