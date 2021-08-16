@@ -67,7 +67,7 @@ class Route
         return new static(method: $method, uri: $uri, status: 422, body: $body, times: $times);
     }
 
-    #[Pure] public static function file(string $uri, string $file, string $method = 'GET', int $status = 200, int $times = 1): self
+    #[Pure] public static function file(string $uri, string $file, string $method = 'GET', int $status = 200, int $times = 1): RouteFile
     {
         return new RouteFile(method: $method, uri: $uri, file: $file, status: $status, times: $times);
     }
@@ -77,7 +77,7 @@ class Route
         return new static(method: "GET", uri: $uri, status: $status, body: $body, times: $times);
     }
 
-    #[Pure] public static function getFile(string $uri, string $file, int $status = 200, int $times = 1): self
+    #[Pure] public static function getFile(string $uri, string $file, int $status = 200, int $times = 1): RouteFile
     {
         return new RouteFile(method: "GET", uri: $uri, file: $file, status: $status, times: $times);
     }

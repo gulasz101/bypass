@@ -104,7 +104,7 @@ class Bypass
                     return false;
                 }
 
-                $this->port = $matches['port'];
+                $this->port = (int)$matches['port'];
 
                 return true;
             }
