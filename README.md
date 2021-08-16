@@ -1,8 +1,5 @@
 <div align="center">
-    <p>
-        <img  src="docs/img/logo.png" alt="Bypass Logo" width="200" />
         <h1>Bypass for PHP</h1>
-    </p>
 </div>
 
 <p align="center">
@@ -18,25 +15,20 @@
 
 ## Note from @gulasz101
 
-This is shameless fork, as I needed this lib to work with my symfony projects and I did not wanted to install whole `illuminate/support` package.
-Also package was build on top of Http facade which was depending on Laravel App.
+This is shameless fork, as I needed this lib to work with my symfony projects and I did not wanted to install
+whole `illuminate/support` package. Also package was build on top of Http facade which was depending on Laravel App.
 
 What I did: replaced `illuminate/http` with `symfony/http-client` and psr compliant libs.
 
-Anyway all credit should go to original author: [@CiaReis](https://github.com/ciareis) 
+Anyway all credit should go to original author: [@CiaReis](https://github.com/ciareis)
 
 -------
 
 ## About
 
-<table>
-  <tr>
-    <td>
-      <p>Bypass for PHP provides a quick way to create a custom HTTP Server to return predefined responses to client requests.</p>
-      <p>This is useful in tests when your application make requests to external services, and you need to simulate different situations like returning specific data or unexpected server errors.</p>
-    </td>
-  </tr>
-</table>
+Bypass for PHP provides a quick way to create a custom HTTP Server to return predefined responses to client requests.
+
+This is very simple implementation of mock server.
 
 -------
 
@@ -101,9 +93,11 @@ $bypassPort = $bypass->getPort(); //16819
 
 ### 3. Routes
 
-Bypass serves two types of routes: The `Standard Route`, which can return a text body content and the `File Route`, which returns a binary file.
+Bypass serves two types of routes: The `Standard Route`, which can return a text body content and the `File Route`,
+which returns a binary file.
 
-When running your tests, you will inform Bypass routes to Application or Service, making it access Bypass URLs instead of the real-world URLs.
+When running your tests, you will inform Bypass routes to Application or Service, making it access Bypass URLs instead
+of the real-world URLs.
 
 #### 3.1 Standard Route
 
@@ -130,11 +124,16 @@ The method `addRoute()` accepts the following parameters:
 
 | Parameter       | Type                  | Description                                                                                                         |
 | :-------------- | :-------------------- | :------------------------------------------------------------------------------------------------------------------ |
-| **HTTP Method** | `string $method`      | [HTTP Request Method](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html) (GET/POST/PUT/PATCH/DELETE)           |
-| **URI**         | `string $uri`         | URI to be served by Bypass                                                                                          |
-| **Status**      | `int $status`         | [HTTP Status Code](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) to be returned by Bypass (default: 200) |
-| **Body**        | `string\|array $body` | Body to be served by Bypass (optional)                                                                              |
-| **Times**       | `int $times`          | How many times the route should be called (default: 1)                                                              |
+| **HTTP
+Method** | `string $method`      | [HTTP Request Method](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html) (GET/POST/PUT/PATCH/DELETE)           |
+| **
+URI**         | `string $uri`         | URI to be served by Bypass                                                                                          |
+| **
+Status**      | `int $status`         | [HTTP Status Code](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) to be returned by Bypass (default: 200) |
+| **
+Body**        | `string\|array $body` | Body to be served by Bypass (optional)                                                                              |
+| **
+Times**       | `int $times`          | How many times the route should be called (default: 1)                                                              |
 
 #### 3.2 File Route
 
@@ -161,11 +160,16 @@ The method `addFileRoute()` accepts the following parameters:
 
 | Parameter       | Type             | Description                                                                                                         |
 | :-------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------ |
-| **HTTP Method** | `string $method` | [HTTP Request Method](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html) (GET/POST/PUT/PATCH/DELETE)           |
-| **URI**         | `string $uri`    | URI to be served by Bypass                                                                                          |
-| **Status**      | `int $status`    | [HTTP Status Code](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) to be returned by Bypass (default: 200) |
-| **File**        | `binary $file`   | Binary file to be served by Bypass                                                                                  |
-| **Times**       | `int $times`     | How many times the route should be called (default: 1)                                                              |
+| **HTTP
+Method** | `string $method` | [HTTP Request Method](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html) (GET/POST/PUT/PATCH/DELETE)           |
+| **
+URI**         | `string $uri`    | URI to be served by Bypass                                                                                          |
+| **
+Status**      | `int $status`    | [HTTP Status Code](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) to be returned by Bypass (default: 200) |
+| **
+File**        | `binary $file`   | Binary file to be served by Bypass                                                                                  |
+| **
+Times**       | `int $times`     | How many times the route should be called (default: 1)                                                              |
 
 #### 3.3 Bypass Serve and Route Helpers
 
@@ -200,33 +204,49 @@ $responseNotFound = $service->getTotalByUser('wally'); //404 - Not found
 //Your test assertions here...
 ```
 
-In the example above Bypasss serves two routes: A URL accessible by method `GET` returning a JSON body with status `200`, and a second route URL accessible by method `GET` and returning status `404`.
+In the example above Bypasss serves two routes: A URL accessible by method `GET` returning a JSON body with status `200`
+, and a second route URL accessible by method `GET` and returning status `404`.
 
 #### Route Helpers
 
 | Route Helper              | Default Method | HTTP Status    | Body                     | Common usage                      |
 | :------------------------ | :------------- | :------------- | :----------------------- | :-------------------------------- |
-| **Route::ok()**           | GET            | 200            | optional (string\|array) | Request was successful            |
-| **Route::created()**      | POST           | 201            | optional (string\|array) | Response to a POST request which resulted in a creation |
-| **Route::badRequest()**   | POST           | 400            | optional (string\|array) | Something can't be parsed (ex: wrong parameter) |
-| **Route::unauthorized()** | GET            | 401            | optional (string\|array) | Not logged in                     |
-| **Route::forbidden()**    | GET            | 403            | optional (string\|array) | Logged in but trying to request a restricted resource (without permission) |
-| **Route::notFound()**     | GET            | 404            | optional (string\|array) | URL or resource does not exist    |
-| **Route::notAllowed()**   | GET            | 405            | optional (string\|array) | Method not allowed                |
-| **Route::validationFailed()** | POST       | 422            | optional (string\|array) | Data sent does not satisfy validation rules |
-| **Route::tooMany()**      | GET            | 429            | optional (string\|array) | Request rejected due to server limitation |
-| **Route::serverError()**  | GET            | 500            | optional (string\|array) | General indication that something is wrong on the server side |
+| **Route::
+ok()**           | GET            | 200            | optional (string\|array) | Request was successful            |
+| **Route::
+created()**      | POST           | 201            | optional (string\|array) | Response to a POST request which resulted in a creation |
+| **Route::
+badRequest()**   | POST           | 400            | optional (string\|array) | Something can't be parsed (ex: wrong parameter) |
+| **Route::
+unauthorized()** | GET            | 401            | optional (string\|array) | Not logged in                     |
+| **Route::
+forbidden()**    | GET            | 403            | optional (string\|array) | Logged in but trying to request a restricted resource (without permission) |
+| **Route::
+notFound()**     | GET            | 404            | optional (string\|array) | URL or resource does not exist    |
+| **Route::
+notAllowed()**   | GET            | 405            | optional (string\|array) | Method not allowed                |
+| **Route::
+validationFailed()** | POST       | 422            | optional (string\|array) | Data sent does not satisfy validation rules |
+| **Route::
+tooMany()**      | GET            | 429            | optional (string\|array) | Request rejected due to server limitation |
+| **Route::
+serverError()**  | GET            | 500            | optional (string\|array) | General indication that something is wrong on the server side |
 
 You may also adjust the helpers to your needs by passing parameters:
-  
+
 | Parameter       | Type             | Description                                                                                                         |
 | :-------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------ |
-| **URI**         | `string $uri`    | URI to be served by Bypass                                                                                          |
-| **Body**        | `string\|array $body` | Body to be served by Bypass (optional)                                                                              |
-| **HTTP Method** | `string $method` | [HTTP Request Method](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html) (GET/POST/PUT/PATCH/DELETE)           |
-| **Times**       | `int $times`     | How many times the route should be called (default: 1)                                                              |
+| **
+URI**         | `string $uri`    | URI to be served by Bypass                                                                                          |
+| **
+Body**        | `string\|array $body` | Body to be served by Bypass (optional)                                                                              |
+| **HTTP
+Method** | `string $method` | [HTTP Request Method](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html) (GET/POST/PUT/PATCH/DELETE)           |
+| **
+Times**       | `int $times`     | How many times the route should be called (default: 1)                                                              |
 
-In the example below, you can see the Helper `Route::badRequest` using method `GET` instead of its default method `POST`.
+In the example below, you can see the Helper `Route::badRequest` using method `GET` instead of its default method `POST`
+.
 
 ```php
 use Ciareis\Bypass\Bypass;
@@ -237,13 +257,15 @@ Bypass::serve(
 );
 ```
 
-📝 Note: Custom routes can be created using a [Standard Route](#31-standard-route) in case something you need is not covered by the Helpers.
+📝 Note: Custom routes can be created using a [Standard Route](#31-standard-route) in case something you need is not
+covered by the Helpers.
 
 ### 4. Asserting Route Calling
 
 You may need to assert that a route was called at least one or multiple times.
 
-The method `assertRoutes()` will return a `RouteNotCalledException` if a route was NOT called as many times as defined in the `$times` parameter.
+The method `assertRoutes()` will return a `RouteNotCalledException` if a route was NOT called as many times as defined
+in the `$times` parameter.
 
 If you need to assert that a route is NOT being called by your service, set the parameter `$times = 0`
 
@@ -282,8 +304,10 @@ To shut down:
 
 ### Use case
 
-To better illustrate Bypass usage, imagine you need to write a test for a service called `TotalScoreService`. This service calculates the total game score of a given username.
-To get the score is obtained making external request to a fictitious API at `emtudo-games.com/v1/score/::USERNAME::`. The API returns HTTP Status `200` and a JSON body with a list of games:
+To better illustrate Bypass usage, imagine you need to write a test for a service called `TotalScoreService`. This
+service calculates the total game score of a given username. To get the score is obtained making external request to a
+fictitious API at `emtudo-games.com/v1/score/::USERNAME::`. The API returns HTTP Status `200` and a JSON body with a
+list of games:
 
 ```json
 {
@@ -441,7 +465,10 @@ class BypassTest extends TestCase
 
 ### Test Examples
 
-📚 See Bypass being used in complete tests with [Pest PHP](https://github.com/ciareis/bypass/blob/main/tests/BypassPestTest.php) and [PHPUnit](https://github.com/ciareis/bypass/blob/main/tests/BypassPhpUnitTest.php) for the [GithubRepoService](https://github.com/ciareis/bypass/blob/main/tests/Services/GithubRepoService.php) demo service.
+📚 See Bypass being used in complete tests
+with [Pest PHP](https://github.com/ciareis/bypass/blob/main/tests/BypassPestTest.php)
+and [PHPUnit](https://github.com/ciareis/bypass/blob/main/tests/BypassPhpUnitTest.php) for
+the [GithubRepoService](https://github.com/ciareis/bypass/blob/main/tests/Services/GithubRepoService.php) demo service.
 
 ## Credits
 
