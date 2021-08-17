@@ -8,27 +8,29 @@ use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Process\Process;
 
-class Bypass
+final class Bypass
 {
+    private const DEFAULT_PORT = 10880;
+
     protected int $port;
     protected Process|null $process;
     protected array $routes = [];
 
-    public static function open(?int $port = null): self
+    public static function open(?int $port = self::DEFAULT_PORT): self
     {
-        $process = new static();
+        $process = new self();
 
         return $process->handle($port);
     }
 
-    public static function up(?int $port = null): self
+    public static function up(?int $port = self::DEFAULT_PORT): self
     {
-        return static::open($port);
+        return self::open($port);
     }
 
     public static function serve(...$routes): self
     {
-        $bypass = static::up();
+        $bypass = self::up();
 
         $routes = is_array($routes[0])
             ? $routes[0]
