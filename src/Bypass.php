@@ -11,19 +11,30 @@ use Symfony\Component\Process\Process;
 final class Bypass
 {
     private const DEFAULT_PORT = 10880;
+    private static int $lastUsedPort;
 
-    protected int $port;
     protected Process|null $process;
-    protected array $routes = [];
 
-    public static function open(?int $port = self::DEFAULT_PORT): self
+    private function __construct(
+        protected int $port,
+        protected array $routes = [],
+    ) {}
+
+    public static function open(?int $port = null): self
     {
-        $process = new self();
+        if (!isset(self::$lastUsedPort)) {
+            self::$lastUsedPort = self::DEFAULT_PORT;
+        }
+        if (null === $port) {
+            self::$lastUsedPort++;
+            $port = self::$lastUsedPort;
+        }
+        $bypass = new self($port);
 
-        return $process->handle($port);
+        return $bypass->handle();
     }
 
-    public static function up(?int $port = self::DEFAULT_PORT): self
+    public static function up(?int $port = null): self
     {
         return self::open($port);
     }
@@ -52,7 +63,7 @@ final class Bypass
         return $bypass;
     }
 
-    public function stop(): self
+    public function clearOldRoutes(): self
     {
         $url = $this->getBaseUrl("___api_faker_clear_router");
 
@@ -67,7 +78,9 @@ final class Bypass
     public function down(): self
     {
         if ($this->process) {
-            $this->process->stop();
+            $this->clearOldRoutes();
+
+            $this->process->stop(1);
             $this->process = null;
         }
 
@@ -85,20 +98,28 @@ final class Bypass
             $path = "/" . $path;
         }
 
-        return "http://localhost:{$this->port}{$path}";
+        return "http://0.0.0.0:{$this->port}{$path}";
     }
 
-    public function handle(?int $port = null): self
+    public function handle(): self
     {
-        $params = [PHP_BINARY, '-S', "localhost:{$port}",  __DIR__ . DIRECTORY_SEPARATOR . 'server.php'];
+        $params = [
+            PHP_BINARY,
+            '-S',
+            "0.0.0.0:{$this->port}",
+            __DIR__ . DIRECTORY_SEPARATOR . 'server.php',
+        ];
 
-        $this->process = new Process($params);
+        $this->process = new Process(
+            command: $params,
+            env: ['SESSION_NAME' => uniqid('', true)]
+        );
         $this->process->start();
 
         // waits until the given anonymous function returns true
         $this->process->waitUntil(
             function ($type, $output) {
-                $pattern = '/\(.*?localhost:(?<port>\d+)\) started/';
+                $pattern = '/\(.*?0\.0\.0\.0:(?<port>\d+)\) started/';
 
                 $matches = [];
 
@@ -112,7 +133,7 @@ final class Bypass
             }
         );
 
-        $this->stop();
+        $this->clearOldRoutes();
 
         return $this;
     }

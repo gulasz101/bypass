@@ -16,12 +16,14 @@ function getFilename($route, $method): string
     $method = strtoupper($method);
     $route = md5($route);
 
-    return "{$sessionName}_{$method}_{$route}.tmp";
+    return "{$sessionName}_{$method}_{$route}.bypass";
 }
 
 function getSessionName(): string
 {
-    return sys_get_temp_dir() . DIRECTORY_SEPARATOR . "session_name_{$_SERVER['SERVER_PORT']}";
+    $sessionName = getenv()['SESSION_NAME'] ?? throw new RuntimeException('env SESSION_NAME not set!');
+
+    return str_replace('.', '_', $sessionName);
 }
 
 function getRoute(string $route, string $method = null): string

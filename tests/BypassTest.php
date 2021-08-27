@@ -9,15 +9,15 @@ use Illuminate\Http\Client\RequestException;
 it(
     'returns bypass with Bypass::serve',
     function () {
-        $bypass = Bypass::serve(
+        $this->bypass = Bypass::serve(
             Route::ok(uri: '/v1/user'),
             Route::forbidden(uri: '/v1/user/1/secrets')
         );
 
-        expect($bypass)->toBeInstanceOf(Bypass::class);
-        expect($bypass->getRoutes())->toHaveCount(2);
-        expect($bypass->getPort())->toBeInt();
-        expect((string)$bypass)->toEqual($bypass->getBaseUrl());
+        expect($this->bypass)->toBeInstanceOf(Bypass::class);
+        expect($this->bypass->getRoutes())->toHaveCount(2);
+        expect($this->bypass->getPort())->toBeInt();
+        expect((string)$this->bypass)->toEqual($this->bypass->getBaseUrl());
     }
 );
 
@@ -26,11 +26,11 @@ test(
     function () {
         $uri = '/v1/user';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::ok(uri: $uri, body: ['name' => 'Leandro Henrique'])
         );
 
-        $response = Http::get($bypass . $uri);
+        $response = Http::get($this->bypass . $uri);
 
         expect((string)$response->getBody())
             ->json()
@@ -46,11 +46,11 @@ test(
     function () {
         $uri = '/v1/user';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::created(uri: $uri, body: ['result' => 'User successfully created'])
         );
 
-        $response = Http::post($bypass . $uri);
+        $response = Http::post($this->bypass . $uri);
 
         expect((string)$response->getBody())
             ->json()
@@ -65,11 +65,11 @@ test(
     function () {
         $uri = '/v1/users?filter=foo';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::badRequest(uri: $uri, body: ['error' => 'Filter parameter foo does not exist.'], method: 'GET')
         );
 
-        $response = Http::get($bypass . $uri);
+        $response = Http::get($this->bypass . $uri);
         expect((string)$response->getBody())
             ->json()
             ->error->toBe('Filter parameter foo does not exist.');
@@ -81,11 +81,11 @@ test(
     function () {
         $uri = '/v1/my-favorites';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::Unauthorized(uri: $uri, body: ['error' => 'Unauthenticated'])
         );
 
-        $response = Http::get($bypass . $uri);
+        $response = Http::get($this->bypass . $uri);
 
         expect((string)$response->getBody())
             ->json()
@@ -100,11 +100,11 @@ test(
     function () {
         $uri = '/v1/user/1';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::forbidden(uri: $uri, body: ['email' => 'leandro.new@ciareis.com'], method: 'PATCH')
         );
 
-        expect(Http::patch($bypass . $uri))
+        expect(Http::patch($this->bypass . $uri))
             ->getStatusCode()->toBe(403);
     }
 );
@@ -115,11 +115,11 @@ test(
     function () {
         $uri = '/v1/fruits';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::notFound(uri: $uri)
         );
 
-        expect(Http::get($bypass . $uri))
+        expect(Http::get($this->bypass . $uri))
             ->getStatusCode()->toBe(404);;
     }
 );
@@ -130,11 +130,11 @@ test(
     function () {
         $uri = '/update-user-with-get-method';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::notAllowed(uri: $uri)
         );
 
-        expect(Http::get($bypass . $uri))
+        expect(Http::get($this->bypass . $uri))
             ->getStatusCode()->toBe(405);
     }
 );
@@ -144,11 +144,11 @@ test(
     function () {
         $uri = '/v1/foobar';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::serverError(uri: $uri)
         );
 
-        $response = Http::get($bypass . $uri);
+        $response = Http::get($this->bypass . $uri);
 
         expect((string)$response->getBody())->toBeEmpty();
         expect($response->getStatusCode())->toBe(500);
@@ -160,14 +160,14 @@ test(
     function () {
         $uri = '/v1/user';
 
-        $bypass = bypass::serve(
+        $this->bypass = bypass::serve(
             Route::validationFailed(
                 uri: $uri,
                 body: ['validation_error' => ['first_name' => ['Name must be at least 5 characters long.']]]
             )
         );
 
-        $response = Http::post($bypass . $uri);
+        $response = Http::post($this->bypass . $uri);
 
         expect((string)$response->getBody())
             ->toBeJson()
@@ -182,16 +182,16 @@ test(
     "Bypass->assertRotues no called /v1/login when it is first argument",
     function () {
         $body = "teste";
-        $bypass = Bypass::serve(
+        $this->bypass = Bypass::serve(
             Route::ok(uri: '/v1/phone/teste', body: $body),
             Route::notFound(uri: '/v1/login', body: ['fruta' => 'banana']),
         );
 
-        $response = Http::get($bypass->getBaseUrl('/v1/phone/teste'));
+        $response = Http::get($this->bypass->getBaseUrl('/v1/phone/teste'));
 
         expect((string)$response->getBody())->toEqual($body);
 
-        $bypass->assertRoutes();
+        $this->bypass->assertRoutes();
     }
 )->throws(
     RouteNotCalledException::class,
@@ -202,16 +202,16 @@ test(
     "Bypass->assertRotues no called /v1/login when it is second argument",
     function () {
         $body = "teste";
-        $bypass = Bypass::serve(
+        $this->bypass = Bypass::serve(
             Route::notFound(uri: '/v1/login', body: ['fruta' => 'banana']),
             Route::ok(uri: '/v1/phone/teste', body: $body),
         );
 
-        $response = Http::get($bypass->getBaseUrl('/v1/phone/teste'));
+        $response = Http::get($this->bypass->getBaseUrl('/v1/phone/teste'));
 
         expect((string)$response->getBody())->toEqual($body);
 
-        $bypass->assertRoutes();
+        $this->bypass->assertRoutes();
     }
 )->throws(
     RouteNotCalledException::class,
@@ -222,17 +222,17 @@ test(
     "Bypass->assertRotues no called /v1/phone/teste when it is first argument",
     function () {
         $body = ['fruta' => 'banana'];
-        $bypass = Bypass::serve(
+        $this->bypass = Bypass::serve(
             Route::ok(uri: '/v1/phone/teste', body: 'teste'),
             Route::notFound(uri: '/v1/login', body: $body),
         );
 
-        $response = Http::get($bypass->getBaseUrl('/v1/login'));
+        $response = Http::get($this->bypass->getBaseUrl('/v1/login'));
 
         expect((string)$response->getBody())->json()->toHaveKeys(['fruta']);
         expect((string)$response->getBody())->json()->toEqual($body);
 
-        $bypass->assertRoutes();
+        $this->bypass->assertRoutes();
     }
 )->throws(
     RouteNotCalledException::class,
@@ -243,16 +243,16 @@ test(
     "Bypass->assertRotues no called /v1/phone/teste when it is second argument",
     function () {
         $body = ['fruta' => 'banana'];
-        $bypass = Bypass::serve(
+        $this->bypass = Bypass::serve(
             Route::notFound(uri: '/v1/login', body: $body),
             Route::ok(uri: '/v1/phone/teste', body: 'teste'),
         );
 
-        $response = Http::get($bypass->getBaseUrl('/v1/login'));
+        $response = Http::get($this->bypass->getBaseUrl('/v1/login'));
         expect((string)$response->getBody())->json()->toHaveKeys(['fruta']);
         expect((string)$response->getBody())->json()->fruta->toBe('banana');
 
-        $bypass->assertRoutes();
+        $this->bypass->assertRoutes();
     }
 )->throws(
     RouteNotCalledException::class,

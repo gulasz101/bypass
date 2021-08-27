@@ -14,9 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET" && $_SERVER['PHP_SELF'] === '/___api_fa
 
 
 if ($_SERVER['REQUEST_METHOD'] === "PUT" && $_SERVER['REQUEST_URI'] === '/___api_faker_clear_router') {
-    $sessionName = getSessionName();
-
-    foreach (glob($sessionName . "_*.tmp") as $file) {
+    foreach (glob('*.bypass') as $file) {
         unlink($file);
     }
     echo "ok.";
@@ -52,7 +50,7 @@ if ($route = currentRoute()) {
     exit;
 }
 
-http_response_code(500);
+http_response_code(404);
 $route = $_SERVER['REQUEST_URI'];
 $method = $_SERVER['REQUEST_METHOD'];
 echo "Bypass route {$route} and method {$method} not found.";
