@@ -4,7 +4,6 @@ use Ciareis\Bypass\Bypass;
 use Ciareis\Bypass\Route;
 use Ciareis\Bypass\RouteNotCalledException;
 use Ciareis\Bypass\Http;
-use Illuminate\Http\Client\RequestException;
 
 it(
     'returns bypass with Bypass::serve',
@@ -22,7 +21,7 @@ it(
 );
 
 test(
-    'Route::ok returns 200 + body',
+    'foobar',
     function () {
         $uri = '/v1/user';
 
@@ -37,7 +36,8 @@ test(
             ->name->toBe('Leandro Henrique');
         expect($response->getStatusCode())
             ->toBeInt()
-            ->ToBe(200);
+	    ->ToBe(200);
+	expect('')->toBe('lorem');
     }
 );
 
@@ -46,7 +46,7 @@ test(
     function () {
         $uri = '/v1/user';
 
-        $this->bypass = bypass::serve(
+        $this->bypass = Bypass::serve(
             Route::created(uri: $uri, body: ['result' => 'User successfully created'])
         );
 
